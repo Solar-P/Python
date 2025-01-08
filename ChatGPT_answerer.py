@@ -3,27 +3,27 @@ import speech_recognition as sr
 import tkinter as tk
 from tkinter import scrolledtext
 
-# Настройка OpenAI API
-openai.api_key = "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"  # Вставьте ваш ключ OpenAI API
+# Insert your OpenAI API key
+openai.api_key = ""  
 
-# Функция для захвата и преобразования звука в текст
+# A function for capturing and converting audio to text
 def transcribe_audio_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
-        log_text.insert(tk.END, "Говорите, я слушаю...\n")
+        log_text.insert(tk.END, "Speak up, I'm listening...\n")
         try:
             audio = recognizer.listen(source, timeout=5)
             text = recognizer.recognize_google(audio, language="en-US")
-            log_text.insert(tk.END, f"Вы сказали: {text}\n")
+            log_text.insert(tk.END, f"You said: {text}\n")
             return text
         except sr.UnknownValueError:
-            log_text.insert(tk.END, "Не удалось распознать речь.\n")
+            log_text.insert(tk.END, "Speech recognition failed.\n")
             return None
         except sr.RequestError as e:
-            log_text.insert(tk.END, f"Ошибка распознавания: {e}\n")
+            log_text.insert(tk.END, f"Recognition error: {e}\n")
             return None
 
-# Отправка запроса в ChatGPT
+# Sending a request to ChatGPT
 def get_response_from_gpt(prompt):
     try:
         response = openai.ChatCompletion.create(
@@ -35,26 +35,26 @@ def get_response_from_gpt(prompt):
         )
         return response['choices'][0]['message']['content']
     except Exception as e:
-        return f"Ошибка: {e}"
+        return f"Error: {e}"
     
-# Обработка нажатия кнопки
+# Button click processing
 def process_audio():
     user_input = transcribe_audio_to_text()
     if user_input:
         get_response_from_gpt(user_input)
 
-# Создание интерфейса
+# Creating an interface
 window = tk.Tk()
-window.title("Голосовой помощник GPT")
+window.title("Voice Assistant GPT")
 window.geometry("600x400")
 
-# Лог
+# Log
 log_text = scrolledtext.ScrolledText(window, wrap=tk.WORD, width=70, height=20)
 log_text.pack(pady=10)
 
-# Кнопка
-start_button = tk.Button(window, text="Начать запись", command=process_audio, bg="green", fg="white", font=("Arial", 12))
+# Button
+start_button = tk.Button(window, text="Start recording", command=process_audio, bg="green", fg="white", font=("Arial", 12))
 start_button.pack(pady=10)
 
-# Запуск приложения
+# Launching the app
 window.mainloop()
